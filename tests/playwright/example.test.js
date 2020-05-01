@@ -5,6 +5,8 @@ const playwright = require('playwright');
 jest.setTimeout(30000);
 
 describe('Example playwright setup', () => {
+  let browser;
+
   beforeAll(async () => {
     const app = express();
 
@@ -12,37 +14,25 @@ describe('Example playwright setup', () => {
 
     httpServer = require('http').createServer(app);
     httpServer.listen('3000');
+
+    browser = await playwright['webkit'].launch();
   });
 
   afterAll(async () => {
     httpServer.close();
+    await browser.close();
   });
 
   test('Example test', async () => {
-    const browser = await playwright['chromium'].launch({
-      headless: false,
-    });
-
     const context = await browser.newContext();
     const page = await context.newPage();
 
     await page.goto('localhost:3000/test.html');
 
-    await page.waitForSelector('"Hello World"');
+    await page.waitForSelector('"Click me"');
 
-    await Promise.all([
-      context.waitForEvent('page'),
-      page.click('"Submit"'),
-    ]);
+    await page.click('"Click me"');
 
-    const page2 = await context.pages()[1];
-    await page2.waitForSelector('"Example Domain"');
-
-    await Promise.all([
-      context.waitForEvent('page'),
-      page.click('"Submit"'),
-    ]);
-
-    await browser.close();
+    await context.close();
   });
 });
