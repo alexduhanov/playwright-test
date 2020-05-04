@@ -15,7 +15,9 @@ describe('Example playwright setup', () => {
     httpServer = require('http').createServer(app);
     httpServer.listen('3000');
 
-    browser = await playwright['webkit'].launch();
+    browser = await playwright['chromium'].launch({
+      headless: false,
+    });
   });
 
   afterAll(async () => {
@@ -29,9 +31,7 @@ describe('Example playwright setup', () => {
 
     await page.goto('localhost:3000/test.html');
 
-    await page.waitForSelector('"Click me"');
-
-    await page.click('"Click me"');
+    await page.waitForTimeout(20000);
 
     await context.close();
   });
